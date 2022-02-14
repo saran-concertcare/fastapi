@@ -1,9 +1,9 @@
-from cgitb import text
 from sqlite3 import Timestamp
 from sqlalchemy import Column,Integer,String,Boolean
 from sqlalchemy.sql.sqltypes import TIMESTAMP
 from sqlalchemy.sql.expression import text
-from .database import Base
+import database
+from database import Base
 
 
 

@@ -1,19 +1,13 @@
 from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
-from enum import auto
-from logging import exception
-from turtle import mode
-from fastapi.params import Body
 from pydantic import BaseModel
-from random import randrange 
 import psycopg2
 from psycopg2.extras import RealDictCursor
 import time
-from sqlalchemy import Boolean
-from app.main import post
-from . import models,schemas,utils
-from .database import engine, get_db
-from .routers import details,users,auth
-
+from database import engine, get_db,Base
+from sqlite3 import Timestamp
+from sqlalchemy.sql.expression import text
+import models
+from routers import auth,details,users
 
 models.Base.metadata.create_all(bind = engine)
 

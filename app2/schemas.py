@@ -3,7 +3,7 @@ from pydantic import BaseModel, EmailStr
 from datetime import datetime
 
 class PostBase(BaseModel):
-    student_id: str 
+    student_id: str
     student_name: str
     academic_year: str
     total_fees: str
@@ -42,3 +42,7 @@ class Token(BaseModel):
 
 class TokenData(BaseModel):
     id: Optional[str] = None
+
+class Refresh_Token(BaseModel):
+    refresh_token : str
+    token_type: str

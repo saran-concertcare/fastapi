@@ -1,9 +1,9 @@
 from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session
-from app2.database import get_db
-from .. import models,schemas
+from database import get_db
+import models,schemas
 from . import oauth2
-from ..database import get_db
+from database import get_db
 from typing import List
 from sqlite3 import Cursor
 
