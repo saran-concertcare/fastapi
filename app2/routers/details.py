@@ -78,6 +78,7 @@ def delete_post(id: int,db: Session = Depends(get_db),current_user: int = Depend
     db.commit()
 
     return Response(status_code=status.HTTP_204_NO_CONTENT)
+
 #def delete_post(id: int):
     #cursor.execute("""DELETE FROM student_details WHERE student_id = %s returning *""",(str(id)))
     #deleted_post = cursor.fetchone()
@@ -125,4 +126,5 @@ current_user: int = Depends(oauth2.get_current_user)):
     #cursor.execute("""SELECT * FROM student_details as sd join personal_info as pi on sd.student_id=pi.student_id
     #WHERE sd.student_id = %s""",(str(student_id)))
     #joined_data=cursor.fetchone()
-    #return  joined_data 
+    #return  joined_data
+    
