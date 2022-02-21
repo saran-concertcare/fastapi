@@ -4,7 +4,7 @@ from database import get_db
 import models,schemas
 from . import oauth2
 from database import get_db
-from typing import List
+from typing import List, Optional
 from sqlite3 import Cursor
 
 router = APIRouter(
@@ -13,8 +13,9 @@ router = APIRouter(
 )
 
 @router.get('/',response_model=List[schemas.Post])
-def test_posts(db: Session = Depends(get_db),current_user: int = Depends(oauth2.get_current_user)):
-    posts = db.query(models.Post).all()
+def test_posts(db: Session = Depends(get_db),current_user: int = Depends(oauth2.get_current_user),
+limit: int = 10,skip: int = 0,search: Optional[str]= ""):
+    posts = db.query(models.Post).filter(models.Post.student_name.contains(search)).limit(limit).offset(skip).all()
     return  posts
 #def get_details():
     #cursor.execute("SELECT * FROM student_details")
@@ -26,8 +27,8 @@ def test_posts(db: Session = Depends(get_db),current_user: int = Depends(oauth2.
 
 @router.post('/',status_code=status.HTTP_201_CREATED,response_model=schemas.Post)
 def create_posts(post: schemas.PostCreate,db: Session = Depends(get_db),current_user: int = Depends(oauth2.get_current_user)):
-    print(current_user.email)
-    new_post = models.Post(**post.dict())
+
+    new_post = models.Post(owner_id=current_user.id,**post.dict())
     #new_post = models.Post(student_id = post.student_id,student_name = post.student_name,
     #academic_year = post.academic_year,total_fees = post.total_fees,fees_paid = post.fees_paid,
     #balance_fees = post.balance_fees)
@@ -68,15 +69,20 @@ def get_post(id: int,db: Session = Depends(get_db),current_user: int = Depends(o
 
 @router.delete("/{id}",status_code=status.HTTP_204_NO_CONTENT)
 def delete_post(id: int,db: Session = Depends(get_db),current_user: int = Depends(oauth2.get_current_user)):
-    post = db.query(models.Post).filter(models.Post.student_id == id)
+    post_query = db.query(models.Post).filter(models.Post.student_id == id)
+    post = post_query.first()
     print(current_user.email)
 
-    if not post.first():
+    if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id:{id} does not exist")
 
-    post.delete(synchronize_session=False)
-    db.commit()
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to perform requested action")
 
+    post_query.delete(synchronize_session=False)
+    db.commit()
+    
+    
     return Response(status_code=status.HTTP_204_NO_CONTENT)
 
 #def delete_post(id: int):
@@ -92,7 +98,7 @@ def delete_post(id: int,db: Session = Depends(get_db),current_user: int = Depend
 
 
 
-@router.put("/{id}")
+@router.put("/test/{id}")
 def update_post(id: int, updated_post: schemas.PostCreate,db: Session = Depends(get_db),
 current_user: int = Depends(oauth2.get_current_user)):
     post_query = db.query(models.Post).filter(models.Post.student_id == id)
@@ -100,6 +106,9 @@ current_user: int = Depends(oauth2.get_current_user)):
 
     if not post:
         raise HTTPException(status_code=status.HTTP_404_NOT_FOUND,detail=f"post with id:{id} does not exist")
+
+    if post.owner_id != current_user.id:
+        raise HTTPException(status_code=status.HTTP_403_FORBIDDEN,detail="Not authorized to perform requested action")
 
     post_query.update(updated_post.dict(),synchronize_session=False)
     db.commit()
