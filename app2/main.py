@@ -1,4 +1,4 @@
-from pydantic import Basemodel
+from pydantic import BaseModel
 from typing import Optional,List
 from fastapi import FastAPI,Response,status,HTTPException,Depends,APIRouter
 from sqlalchemy.orm import Session

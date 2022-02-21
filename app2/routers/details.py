@@ -16,6 +16,10 @@ router = APIRouter(
 def test_posts(db: Session = Depends(get_db),current_user: int = Depends(oauth2.get_current_user),
 limit: int = 10,skip: int = 0,search: Optional[str]= ""):
     posts = db.query(models.Post).filter(models.Post.student_name.contains(search)).limit(limit).offset(skip).all()
+
+    results = db.query(models.Post)
+    print(results)
+
     return  posts
 #def get_details():
     #cursor.execute("SELECT * FROM student_details")
